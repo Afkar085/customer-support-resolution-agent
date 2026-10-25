@@ -55,10 +55,12 @@ To use a real model, put a key in `.env`. Three options:
 | Provider | Cost | `.env` |
 | --- | --- | --- |
 | Anthropic | paid | `ANTHROPIC_API_KEY=sk-ant-...` |
-| Groq | free, no card | `LLM_PROVIDER=openai`, `OPENAI_API_KEY=gsk_...`, `MODEL_NAME=llama-3.3-70b-versatile` |
+| Groq | free, no card | `LLM_PROVIDER=openai`, `OPENAI_API_KEY=gsk_...`, `MODEL_NAME=openai/gpt-oss-120b` |
 | Ollama | free, local | `LLM_PROVIDER=openai`, `OPENAI_API_KEY=ollama`, `OPENAI_BASE_URL=http://localhost:11434/v1`, `MODEL_NAME=llama3.1` |
 
-Any OpenAI-compatible endpoint works; `.env.example` has OpenRouter too. Which
+Any OpenAI-compatible endpoint works; `.env.example` has OpenRouter too. Model
+names come and go on the free providers — if a call 404s, list what your key can
+actually see with `GET {base_url}/models`. Which
 mode produced a run is recorded on the run and shown in the console, so the
 three are never confused.
 

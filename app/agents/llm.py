@@ -17,6 +17,7 @@ report, so the two are never confused.
 from __future__ import annotations
 
 import json
+import logging
 import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -29,6 +30,8 @@ from app.services.errors import ErrorCode, ToolError
 
 T = TypeVar("T", bound=BaseModel)
 
+logger = logging.getLogger("support_agent.llm")
+
 _JSON_BLOCK_RE = re.compile(r"\{.*\}", re.DOTALL)
 
 
@@ -38,6 +41,8 @@ class ModelUsage:
     input_tokens: int = 0
     output_tokens: int = 0
     repairs: int = 0
+    transport_errors: int = 0
+    last_error: str | None = None
     mode: str = "offline"
     per_task: dict[str, int] = field(default_factory=dict)
 
@@ -63,6 +68,8 @@ class ModelUsage:
             "input_tokens": self.input_tokens,
             "output_tokens": self.output_tokens,
             "repairs": self.repairs,
+            "transport_errors": self.transport_errors,
+            "last_error": self.last_error,
             "per_task": dict(self.per_task),
             "estimated_cost_usd_micros": self.estimated_cost_usd_micros,
         }
@@ -149,7 +156,19 @@ class LLMClient:
             except (ValidationError, ValueError):
                 # Validate, attempt limited repair, then stop guessing.
                 return offline()
-        except Exception:  # transport-level failure
+        except Exception as exc:  # transport-level failure
+            # Silently falling back here once cost an afternoon: a wrong model
+            # name looked identical to "no key configured". Record it so the
+            # run's audit trail and the logs say which provider refused, and
+            # still fall back rather than failing the ticket.
+            self.usage.transport_errors += 1
+            detail = str(exc)
+            response = getattr(exc, "response", None)
+            if response is not None:
+                detail = f"{response.status_code}: {response.text[:300]}"
+            self.usage.last_error = f"{type(exc).__name__} -- {detail[:400]}"
+            logger.warning("model call failed (%s), using the offline reasoner: %s",
+                           self.mode, self.usage.last_error)
             return offline()
 
     def _call(self, task: str, system: str, prompt: str) -> str:
