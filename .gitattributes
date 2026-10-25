@@ -1,0 +1,10 @@
+# Normalise text to LF in the repository so a clone on Linux or macOS does not
+# arrive with CRLF line endings from a Windows checkout.
+* text=auto eol=lf
+
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.mp4  binary
+*.ico  binary

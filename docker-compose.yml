@@ -1,0 +1,36 @@
+# Postgres + the API. The app also runs with no Docker at all (SQLite default);
+# this file is what you use to run it against the database the schema targets.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: support
+      POSTGRES_PASSWORD: support
+      POSTGRES_DB: support
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U support -d support"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build: .
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      DATABASE_URL: postgresql+psycopg://support:support@db:5432/support
+      ENVIRONMENT: demo
+      # Unset ANTHROPIC_API_KEY runs the deterministic reasoner.
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      MODEL_NAME: ${MODEL_NAME:-claude-sonnet-5-5}
+    ports: ["8000:8000"]
+    command: >
+      sh -c "alembic upgrade head &&
+             python -m scripts.seed_data &&
+             python -m scripts.ingest_policies &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+volumes:
+  pgdata:

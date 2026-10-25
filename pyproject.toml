@@ -1,0 +1,50 @@
+[project]
+name = "customer-support-resolution-agent"
+version = "1.0.0"
+description = "Agentic customer support resolution with policy retrieval, human-approved refunds and idempotent execution."
+requires-python = ">=3.11"
+readme = "README.md"
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "sqlalchemy>=2.0",
+  "alembic>=1.13",
+  "pydantic>=2.8",
+  "pydantic-settings>=2.4",
+  "httpx>=0.27",
+  "jinja2>=3.1",
+  "psycopg[binary]>=3.2",
+  "psycopg-pool>=3.2",
+  "langgraph>=1.0",
+  "langgraph-checkpoint>=2.0",
+  "langgraph-checkpoint-sqlite>=2.0",
+  "langgraph-checkpoint-postgres>=2.0",
+  "anthropic>=0.40",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-asyncio>=0.23", "ruff>=0.6"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*", "mock_services*", "scripts*", "evals*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ["error::DeprecationWarning:app.*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+# SIM905 would rewrite a readable word list into a 600-character literal.
+ignore = ["B008", "E501", "SIM905"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]
+"migrations/*" = ["I001"]
