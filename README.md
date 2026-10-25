@@ -30,7 +30,8 @@ part where being wrong costs money.
 
 **On Windows, double-click `start.bat`.** It resets the demo data, starts the
 server and opens <http://localhost:8000>. Close the black window to stop it.
-[`DEMO.md`](DEMO.md) is the three-minute walkthrough script.
+[`DEMO.md`](DEMO.md) is the three-minute walkthrough script, and
+[`INTERVIEW.md`](INTERVIEW.md) is why it exists and the questions it invites.
 
 Everything below is the manual equivalent. Nothing to install beyond Python 3.11+. The default database is a SQLite file
 in the repo, and with no `ANTHROPIC_API_KEY` the agents run a deterministic
