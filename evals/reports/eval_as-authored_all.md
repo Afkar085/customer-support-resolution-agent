@@ -29,7 +29,7 @@
 
 ## Operational
 
-- median active execution: 42 ms (p95 97 ms)
+- median active execution: 42 ms (p95 94 ms)
 - mean model calls per case: 4
 - mean tool calls per case: 5.08
 - mean estimated cost: 0 USD micros

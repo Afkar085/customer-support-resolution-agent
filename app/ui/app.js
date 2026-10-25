@@ -569,7 +569,7 @@ function renderEvidence(run) {
   proposals.forEach((proposal) => {
     const approval = proposal.approval;
     const tone = { executed: "ok", approved: "ok", rejected: "danger", invalidated: "neutral" }[proposal.status] || "warn";
-    parts.push(`<div class="record">
+    parts.push(`<div class="record tone-${tone}">
       <div class="record-head">
         <div>
           <p class="amount">${money(proposal.payload.amount_minor, proposal.payload.currency)}</p>
@@ -586,7 +586,7 @@ function renderEvidence(run) {
 
   operations.forEach((op) => {
     const tone = { succeeded: "ok", failed: "danger", cancelled: "neutral" }[op.status] || "warn";
-    parts.push(`<div class="record">
+    parts.push(`<div class="record tone-${tone}">
       <div class="record-head">
         <div>
           <p class="amount">${money(op.amount_minor, op.currency)}</p>
@@ -662,16 +662,21 @@ function approvalRecord(card) {
   const proposal = card.proposal;
   const pending = card.decision === "pending";
   const tone = { pending: "warn", approved: "ok", rejected: "danger", expired: "neutral" }[card.decision];
+  // A decided docket gets stamped. It is the clearest possible signal that a
+  // person, not the agent, closed this one.
+  const mark = pending
+    ? `<span class="pill pill-${tone}">${esc(card.decision)}</span>`
+    : `<span class="stamp is-${esc(card.decision)}">${esc(card.decision)}</span>`;
   const customer = card.customer || {};
   const order = card.order || {};
   const ticket = card.ticket || {};
-  return `<div class="record">
+  return `<div class="record tone-${tone}">
     <div class="record-head">
       <div>
         <p class="amount">${esc(card.amount_display)}</p>
         <p class="record-sub">to ${esc(customer.name || "a customer")} · ${esc(order.order_id || "")}</p>
       </div>
-      <span class="pill pill-${tone}">${esc(card.decision)}</span>
+      ${mark}
     </div>
     <div class="record-body">
       <dl class="kv">
