@@ -4,6 +4,8 @@ Two execution modes, chosen at startup:
 
 * ``anthropic`` -- a real Claude call, JSON-only response, parsed into a
   pydantic schema, with one bounded repair attempt if the first parse fails.
+* ``openai``    -- the same, against any OpenAI-compatible chat-completions
+  endpoint: Groq, OpenRouter, Together, or a local Ollama.
 * ``offline``   -- a deterministic reasoner supplied by each agent.
 
 The offline mode is not a stub for missing functionality. It exists because the
@@ -75,14 +77,31 @@ class LLMClient:
         self.usage.mode = self.mode
 
     def _resolve_mode(self) -> str:
-        if self.settings.force_offline_reasoner or not self.settings.anthropic_api_key:
+        """Anthropic, then any OpenAI-compatible provider, then offline."""
+        settings = self.settings
+        if settings.force_offline_reasoner or settings.llm_provider == "offline":
             return "offline"
-        try:
-            import anthropic  # noqa: PLC0415
-        except ImportError:  # pragma: no cover - dependency is pinned
-            return "offline"
-        self._client = anthropic.Anthropic(api_key=self.settings.anthropic_api_key)
-        return "anthropic"
+
+        wants = settings.llm_provider
+        if wants in ("auto", "anthropic") and settings.anthropic_api_key:
+            try:
+                import anthropic  # noqa: PLC0415
+            except ImportError:  # pragma: no cover - dependency is pinned
+                return "offline"
+            self._client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+            return "anthropic"
+
+        if wants in ("auto", "openai") and settings.openai_api_key:
+            import httpx  # noqa: PLC0415
+
+            self._client = httpx.Client(
+                base_url=settings.openai_base_url.rstrip("/"),
+                headers={"Authorization": f"Bearer {settings.openai_api_key}"},
+                timeout=60.0,
+            )
+            return "openai"
+
+        return "offline"
 
     # ------------------------------------------------------------------ #
     def structured(
@@ -134,6 +153,8 @@ class LLMClient:
             return offline()
 
     def _call(self, task: str, system: str, prompt: str) -> str:
+        if self.mode == "openai":
+            return self._call_openai(task, system, prompt)
         assert self._client is not None
         response = self._client.messages.create(
             model=self.settings.model_name,
@@ -150,6 +171,35 @@ class LLMClient:
         )
         parts = [block.text for block in response.content if getattr(block, "type", "") == "text"]
         return "\n".join(parts)
+
+    def _call_openai(self, task: str, system: str, prompt: str) -> str:
+        """Chat-completions shape: Groq, OpenRouter, Together, local Ollama."""
+        assert self._client is not None
+        payload: dict[str, Any] = {
+            "model": self.settings.model_name,
+            "max_tokens": self.settings.model_max_tokens,
+            "temperature": self.settings.model_temperature,
+            "messages": [
+                {"role": "system", "content": system},
+                {"role": "user", "content": prompt},
+            ],
+            # Honoured by Groq and most hosts; harmless where it is not.
+            "response_format": {"type": "json_object"},
+        }
+        response = self._client.post("/chat/completions", json=payload)
+        if response.status_code == 400 and "response_format" in response.text:
+            payload.pop("response_format")
+            response = self._client.post("/chat/completions", json=payload)
+        response.raise_for_status()
+        body = response.json()
+
+        usage = body.get("usage") or {}
+        self.usage.add(
+            task,
+            input_tokens=usage.get("prompt_tokens", 0) or 0,
+            output_tokens=usage.get("completion_tokens", 0) or 0,
+        )
+        return body["choices"][0]["message"]["content"] or ""
 
     @staticmethod
     def _parse(schema: type[T], raw: str) -> T:

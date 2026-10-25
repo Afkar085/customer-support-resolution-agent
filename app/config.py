@@ -28,7 +28,13 @@ class Settings(BaseSettings):
     sql_echo: bool = False
 
     # --- model configuration -------------------------------------------------
+    # "auto" picks Anthropic if its key is set, then any OpenAI-compatible
+    # provider (Groq, OpenRouter, Together, a local Ollama), then the offline
+    # reasoner. Set it explicitly to pin one.
+    llm_provider: str = "auto"          # auto | anthropic | openai | offline
     anthropic_api_key: str | None = None
+    openai_api_key: str | None = None
+    openai_base_url: str = "https://api.groq.com/openai/v1"
     model_name: str = "claude-sonnet-5-5"
     model_max_tokens: int = 1500
     model_temperature: float = 0.0

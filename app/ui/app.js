@@ -261,6 +261,10 @@ async function loadRuntime() {
     row.className = "rail-status is-ok";
     $("rail-status-text").textContent =
       `${health.database} · ${health.model_mode === "offline" ? "offline agents" : health.model_name}`;
+    $("rail-status").title =
+      health.model_mode === "offline"
+        ? "No API key set — the agents are running the deterministic fallback."
+        : `Reasoning steps go to ${health.model_name} via ${health.model_mode}.`;
   } catch {
     row.className = "rail-status is-bad";
     $("rail-status-text").textContent = "API unreachable";

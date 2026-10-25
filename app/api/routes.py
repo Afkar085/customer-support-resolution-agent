@@ -35,6 +35,17 @@ from app.workflows import runner
 router = APIRouter()
 
 
+def _model_mode(settings) -> str:
+    """What the agents will actually run on, as the console reports it."""
+    if settings.force_offline_reasoner or settings.llm_provider == "offline":
+        return "offline"
+    if settings.llm_provider in ("auto", "anthropic") and settings.anthropic_api_key:
+        return "anthropic"
+    if settings.llm_provider in ("auto", "openai") and settings.openai_api_key:
+        return "openai"
+    return "offline"
+
+
 # --------------------------------------------------------------------------- #
 # Health
 # --------------------------------------------------------------------------- #
@@ -47,7 +58,7 @@ def health(session: DbSession) -> dict[str, Any]:
         "status": "ok",
         "environment": settings.environment,
         "database": "postgres" if settings.is_postgres else "sqlite",
-        "model_mode": "offline" if not settings.anthropic_api_key else "anthropic",
+        "model_mode": _model_mode(settings),
         "model_name": settings.model_name,
         "policy_documents": len(documents),
         "approval_ttl_minutes": settings.approval_ttl_minutes,
