@@ -554,3 +554,45 @@ details.disclose p { margin-top: 11px; font-size: 14px; line-height: 1.65; color
   .select-field.grow { flex-basis: 100%; }
   .chip-btn { flex: 1 1 100%; }
 }
+
+/* ===========================================================================
+   Console, simplified.
+   The screen is now two things: a box to type in, and the answer. Everything
+   else -- the primer, the step list, the evidence, the extra examples -- is
+   one click away and shut by default.
+   =========================================================================== */
+
+.primer { background: var(--surface); border: 1px solid var(--line); }
+.primer > summary {
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  padding: 14px 20px; cursor: pointer; list-style: none;
+  font-size: 14.5px; color: var(--ink-2);
+}
+.primer > summary::-webkit-details-marker { display: none; }
+.primer > summary::before { content: "+"; font: 500 15px/1 var(--mono); color: var(--brass); }
+.primer[open] > summary::before { content: "\2212"; }
+.primer > summary b { color: var(--ink); font-weight: 600; }
+.primer > summary:hover { background: var(--sunk); }
+.primer-body { padding: 4px 20px 22px; display: grid; gap: 16px; border-top: 1px solid var(--line); }
+.primer-lead { font-size: 15px; line-height: 1.7; color: var(--ink-2); max-width: 70ch; padding-top: 16px; }
+.primer-rule { font-size: 14.5px; line-height: 1.7; color: var(--ink-2); max-width: 70ch;
+  border-left: 2px solid var(--brass); padding-left: 16px; }
+.primer-rule b { display: block; color: var(--ink); font-size: 16px; margin-bottom: 6px; }
+
+.ask .panel-body { gap: 14px; }
+.ask-row { display: flex; align-items: flex-end; gap: 12px; }
+.ask-row .field.grow { flex: 1; }
+.ask-row .btn { flex: none; }
+
+.answer .panel-body { gap: 14px; }
+.answer .disclose { padding-top: 14px; }
+.answer .disclose[open] > summary { margin-bottom: 14px; }
+.answer .meta-row { margin-bottom: 16px; }
+
+/* On the Console the two panels stack: ask, then answer. No side-by-side. */
+#view-console.is-active { max-width: 1040px; }
+
+@media (max-width: 620px) {
+  .ask-row { flex-wrap: wrap; }
+  .ask-row .btn { width: 100%; }
+}

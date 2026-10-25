@@ -97,21 +97,18 @@
       <!-- ═════════════════════════ CONSOLE ═════════════════════════ -->
       <section class="view is-active" id="view-console">
 
-        <!-- the explainer: what this is, in one screen -->
-        <section class="explain" id="explain">
-          <div class="explain-main">
-            <p class="eyebrow">What you are looking at</p>
-            <h2 class="explain-head">
-              A support agent that investigates a complaint, quotes the policy,
-              and <em>stops before it spends money</em>.
-            </h2>
-            <p class="explain-body">
-              A customer writes in. The agent reads their order, return and payment,
-              finds the policy section that applies, and writes a reply. If money
-              should move, it does not move it — it hands a reviewer a proposal and
-              waits. That pause is the whole point of the project.
+        <!-- A primer, closed by default. It is read once; after that it is noise. -->
+        <details class="primer" id="primer">
+          <summary>
+            <b>New here?</b>
+            <span>A support agent that investigates a complaint, quotes the policy, and stops before it spends money.</span>
+          </summary>
+          <div class="primer-body">
+            <p class="primer-lead">
+              A customer writes in. The agent reads their order, return and payment, finds the
+              policy section that applies, and writes a reply. If money should move, it does not
+              move it &mdash; it hands a reviewer a proposal and waits.
             </p>
-
             <ol class="pipeline" aria-label="How one request flows">
               <li><span>1</span>Check who is asking</li>
               <li><span>2</span>Read the order</li>
@@ -121,105 +118,80 @@
               <li class="is-human"><span>6</span>A human approves</li>
               <li class="is-money"><span>7</span>Pay, then verify</li>
             </ol>
+            <p class="primer-rule">
+              <b>The model proposes. The code decides and pays.</b>
+              The model reads the complaint, summarises records, interprets policy and writes the
+              reply. Who you are, what you own, whether a refund is allowed, how much, and the
+              payment itself are ordinary code.
+            </p>
           </div>
+        </details>
 
-          <aside class="explain-side">
-            <h3>The one rule</h3>
-            <p class="rule">The model <b>proposes</b>.<br />The code <b>decides and pays</b>.</p>
-            <dl class="split-duties">
-              <dt>The model does</dt>
-              <dd>Reading the complaint, summarising records, interpreting policy, writing the reply.</dd>
-              <dt>Only code does</dt>
-              <dd>Who you are, what you own, whether a refund is allowed, how much, and the payment itself.</dd>
-            </dl>
-            <button class="btn btn-ghost btn-sm" id="explain-toggle" type="button">
-              <svg class="ico" aria-hidden="true"><use href="#i-chevron" /></svg>
-              <span>Hide this</span>
-            </button>
-          </aside>
-        </section>
-
-        <!-- numbers -->
-        <div class="stats">
-          <article class="stat"><p class="stat-label">Open tickets</p><p class="stat-value" id="s-open">—</p><p class="stat-note" id="s-open-note">&nbsp;</p></article>
-          <article class="stat"><p class="stat-label">Waiting for a person</p><p class="stat-value" id="s-pending">—</p><p class="stat-note">refunds it refused to issue alone</p></article>
-          <article class="stat"><p class="stat-label">Refunds paid</p><p class="stat-value" id="s-settled">—</p><p class="stat-note" id="s-settled-note">&nbsp;</p></article>
-          <article class="stat is-guarded"><p class="stat-label">Paid twice by mistake</p><p class="stat-value" id="s-dupes">—</p><p class="stat-note">the number this project exists to keep at zero</p></article>
-        </div>
-
-        <div class="split">
-          <!-- composer -->
-          <section class="panel" aria-labelledby="composer-h">
-            <header class="panel-head">
-              <h2 id="composer-h">Write a complaint</h2>
-            </header>
-            <div class="panel-body">
-              <p class="help">Pick a situation — each one is a real record in the database, set up to behave differently.</p>
-              <div class="scenario-grid" id="scenario-buttons"></div>
-
-              <label class="field" for="complaint">
-                <span class="field-label">The message</span>
-                <textarea id="complaint" rows="4" spellcheck="true"></textarea>
-              </label>
-
-              <label class="field" for="order-select">
+        <!-- ask -->
+        <section class="panel ask" aria-labelledby="ask-h">
+          <header class="panel-head">
+            <h2 id="ask-h">Ask it something</h2>
+            <span class="help">as a customer</span>
+          </header>
+          <div class="panel-body">
+            <div class="scenario-grid" id="scenario-primary"></div>
+            <label class="field" for="complaint">
+              <span class="field-label">Or write your own</span>
+              <textarea id="complaint" rows="3" spellcheck="true"></textarea>
+            </label>
+            <div class="ask-row">
+              <label class="field grow" for="order-select">
                 <span class="field-label">About which order</span>
                 <select id="order-select"></select>
               </label>
-              <p class="help" id="order-note">&nbsp;</p>
-
-              <details class="advanced">
-                <summary>Advanced</summary>
-                <label class="field" for="variant-select">
-                  <span class="field-label">Agent layout</span>
-                  <select id="variant-select">
-                    <option value="specialists">Three specialists, in order (default)</option>
-                    <option value="parallel">Three specialists, at the same time</option>
-                    <option value="baseline">One generalist agent</option>
-                  </select>
-                </label>
-                <p class="help">Changes how the work is split up. The measured difference is in <code>docs/evaluation.md</code>.</p>
-              </details>
-            </div>
-            <footer class="panel-foot">
               <button class="btn btn-primary" id="submit-complaint" type="button">
                 <svg class="ico" aria-hidden="true"><use href="#i-send" /></svg>
                 <span>Send it</span>
               </button>
-              <kbd>Ctrl + Enter</kbd>
-            </footer>
-          </section>
-
-          <!-- result -->
-          <section class="panel" aria-labelledby="run-h">
-            <header class="panel-head">
-              <div>
-                <h2 id="run-h">What the agent did</h2>
-                <p class="run-id mono" id="run-id">nothing yet</p>
-              </div>
-              <div class="head-tools">
-                <span class="pill" id="run-status" hidden></span>
-                <button class="btn btn-ghost btn-sm" id="refresh-run" type="button" hidden>
-                  <svg class="ico" aria-hidden="true"><use href="#i-refresh" /></svg><span>Refresh</span>
-                </button>
-              </div>
-            </header>
-            <div class="panel-body">
-              <div id="outcome"></div>
-              <dl class="meta-row" id="run-meta" hidden></dl>
-              <div class="run-split">
-                <div>
-                  <h3 class="sub-head">Step by step</h3>
-                  <div id="timeline"></div>
-                </div>
-                <div>
-                  <h3 class="sub-head">What it read, what it quoted</h3>
-                  <div id="evidence"></div>
-                </div>
-              </div>
             </div>
-          </section>
-        </div>
+            <p class="help" id="order-note">&nbsp;</p>
+            <details class="advanced">
+              <summary>More examples and settings</summary>
+              <div class="scenario-grid" id="scenario-more"></div>
+              <label class="field" for="variant-select">
+                <span class="field-label">Agent layout</span>
+                <select id="variant-select">
+                  <option value="specialists">Three specialists, in order (default)</option>
+                  <option value="parallel">Three specialists, at the same time</option>
+                  <option value="baseline">One generalist agent</option>
+                </select>
+              </label>
+            </details>
+          </div>
+        </section>
+
+        <!-- answer -->
+        <section class="panel answer" aria-labelledby="run-h">
+          <header class="panel-head">
+            <div>
+              <h2 id="run-h">The answer</h2>
+              <p class="run-id mono" id="run-id">nothing yet</p>
+            </div>
+            <div class="head-tools">
+              <span class="pill" id="run-status" hidden></span>
+              <button class="btn btn-ghost btn-sm" id="refresh-run" type="button" hidden>
+                <svg class="ico" aria-hidden="true"><use href="#i-refresh" /></svg><span>Refresh</span>
+              </button>
+            </div>
+          </header>
+          <div class="panel-body">
+            <div id="outcome"></div>
+            <details class="disclose" id="steps-disclose">
+              <summary>Show every step it took</summary>
+              <dl class="meta-row" id="run-meta" hidden></dl>
+              <div id="timeline"></div>
+            </details>
+            <details class="disclose">
+              <summary>Show what it read and what it quoted</summary>
+              <div id="evidence"></div>
+            </details>
+          </div>
+        </section>
       </section>
 
       <!-- ════════════════════════ APPROVALS ════════════════════════ -->
@@ -249,6 +221,12 @@
 
       <!-- ═══════════════════════ RELIABILITY ═══════════════════════ -->
       <section class="view" id="view-reliability">
+        <div class="stats">
+          <article class="stat"><p class="stat-label">Open tickets</p><p class="stat-value" id="s-open">—</p><p class="stat-note" id="s-open-note">&nbsp;</p></article>
+          <article class="stat"><p class="stat-label">Waiting for a person</p><p class="stat-value" id="s-pending">—</p><p class="stat-note">refunds it refused to issue alone</p></article>
+          <article class="stat"><p class="stat-label">Refunds paid</p><p class="stat-value" id="s-settled">—</p><p class="stat-note" id="s-settled-note">&nbsp;</p></article>
+          <article class="stat is-guarded"><p class="stat-label">Paid twice by mistake</p><p class="stat-value" id="s-dupes">—</p><p class="stat-note">the number this project exists to keep at zero</p></article>
+        </div>
         <p class="section-lede">
           The hardest case for any system that spends money: the payment provider takes the
           refund, then the connection drops before it can tell you. Retry blindly and you have
