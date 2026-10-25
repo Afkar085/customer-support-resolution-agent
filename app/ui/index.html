@@ -1,19 +1,18 @@
 <!doctype html>
-<html lang="en" data-theme="">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Voltline Support Console</title>
-<meta name="description" content="Resolution console for Voltline Electronics support: investigate a complaint, cite the policy, approve refunds, verify what settled." />
+<meta name="description" content="A support agent that investigates a complaint, cites the policy, and stops before it spends money." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230e6a6a'/%3E%3Cpath d='M9 21.5 15 9h2.6l-3.4 7.1h5.2L13.4 25h-2.2l2.6-5.4H9z' fill='%23fff'/%3E%3C/svg%3E" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;500;600;700&display=swap" />
 <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
 
-<!-- Icon set. Stroke icons at 24px, drawn here so the page needs no icon font. -->
 <svg class="sprite" aria-hidden="true" focusable="false">
   <symbol id="i-console" viewBox="0 0 24 24"><path d="M3 5h18v11H3z"/><path d="M8 20h8M12 16v4"/><path d="M7 9l2.5 2L7 13"/><path d="M12.5 13h4"/></symbol>
   <symbol id="i-approvals" viewBox="0 0 24 24"><path d="M12 3l7 3v5.5c0 4-2.9 7.6-7 8.5-4.1-.9-7-4.5-7-8.5V6l7-3z"/><path d="M9 12l2.2 2.2L15.5 10"/></symbol>
@@ -30,319 +29,329 @@
   <symbol id="i-send" viewBox="0 0 24 24"><path d="M4 12l16-7-5.5 16-3.2-6.3z"/><path d="M11.3 14.7 20 5"/></symbol>
   <symbol id="i-empty" viewBox="0 0 24 24"><path d="M4 8.5 12 4l8 4.5v7L12 20l-8-4.5z"/><path d="M4 8.5 12 13l8-4.5M12 13v7"/></symbol>
   <symbol id="i-link" viewBox="0 0 24 24"><path d="M10.5 13.5a4 4 0 0 0 5.7 0l2.3-2.3a4 4 0 0 0-5.7-5.7l-1.2 1.2"/><path d="M13.5 10.5a4 4 0 0 0-5.7 0l-2.3 2.3a4 4 0 0 0 5.7 5.7l1.2-1.2"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M9 9h6v6H9z"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="M8 10l4 4 4-4"/></symbol>
 </svg>
 
 <div class="app">
 
-  <!-- ───────────────────────────── left rail ───────────────────────────── -->
+  <!-- ─────────────────────────────── rail ─────────────────────────────── -->
   <aside class="rail">
-    <a class="brand" href="#console">
+    <div class="brand">
       <span class="brand-mark" aria-hidden="true">
         <svg viewBox="0 0 32 32"><path d="M9 21.5 15 9h2.6l-3.4 7.1h5.2L13.4 25h-2.2l2.6-5.4H9z" fill="currentColor" stroke="none"/></svg>
       </span>
       <span class="brand-text">
-        <span class="brand-name">Voltline</span>
-        <span class="brand-sub">Support Console</span>
+        <b>Voltline</b>
+        <span>Support Console</span>
       </span>
-    </a>
+    </div>
 
     <nav class="nav" aria-label="Sections">
-      <p class="nav-label">Workspace</p>
       <button class="nav-item is-active" data-view="console" type="button">
         <svg class="ico" aria-hidden="true"><use href="#i-console" /></svg>
-        <span>Console</span>
+        <span class="nav-text"><b>Console</b><small>Send a complaint, watch it resolve</small></span>
       </button>
       <button class="nav-item" data-view="approvals" type="button">
         <svg class="ico" aria-hidden="true"><use href="#i-approvals" /></svg>
-        <span>Approvals</span>
+        <span class="nav-text"><b>Approvals</b><small>Decide the refunds it proposes</small></span>
         <span class="count" id="nav-approval-count" hidden>0</span>
       </button>
-
-      <p class="nav-label">Operations</p>
       <button class="nav-item" data-view="reliability" type="button">
         <svg class="ico" aria-hidden="true"><use href="#i-reliability" /></svg>
-        <span>Reliability</span>
+        <span class="nav-text"><b>Reliability</b><small>Break the provider, check the money</small></span>
       </button>
       <button class="nav-item" data-view="reference" type="button">
         <svg class="ico" aria-hidden="true"><use href="#i-reference" /></svg>
-        <span>Tools &amp; policy</span>
+        <span class="nav-text"><b>Reference</b><small>Its tools and its policy book</small></span>
       </button>
     </nav>
 
     <div class="rail-foot">
-      <div class="runtime" id="runtime">
-        <div class="runtime-row"><span>Database</span><b id="rt-db">—</b></div>
-        <div class="runtime-row"><span>Agents</span><b id="rt-model">—</b></div>
-        <div class="runtime-row"><span>Policies</span><b id="rt-policies">—</b></div>
-      </div>
-      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch theme">
+      <p class="rail-status" id="rail-status"><span class="dot"></span><span id="rail-status-text">connecting…</span></p>
+      <button class="btn btn-ghost btn-sm" id="theme-toggle" type="button">
         <svg class="ico" aria-hidden="true"><use href="#i-sun" /></svg>
         <span id="theme-label">Light</span>
       </button>
     </div>
   </aside>
 
-  <!-- ───────────────────────────── main column ─────────────────────────── -->
+  <!-- ─────────────────────────────── main ─────────────────────────────── -->
   <div class="main">
     <header class="topbar">
-      <div class="topbar-title">
+      <div>
         <h1 id="page-title">Console</h1>
-        <p id="page-sub">Submit a request and follow the resolution end to end.</p>
+        <p class="lede" id="page-sub">Send a complaint and watch the agent resolve it.</p>
       </div>
-      <div class="topbar-tools">
-        <label class="select-field" for="customer-select">
-          <span>Signed in as</span>
-          <select id="customer-select"></select>
-        </label>
-        <span class="env-pill" id="env-pill" title="Environment">local</span>
-      </div>
+      <label class="who" for="customer-select">
+        <span>You are</span>
+        <select id="customer-select"></select>
+      </label>
     </header>
 
     <div class="canvas">
 
-      <!-- ═══════════════════════════ CONSOLE ═══════════════════════════ -->
+      <!-- ═════════════════════════ CONSOLE ═════════════════════════ -->
       <section class="view is-active" id="view-console">
 
-        <div class="stats" id="stats">
+        <!-- the explainer: what this is, in one screen -->
+        <section class="explain" id="explain">
+          <div class="explain-main">
+            <p class="eyebrow">What you are looking at</p>
+            <h2 class="explain-head">
+              A support agent that investigates a complaint, quotes the policy,
+              and <em>stops before it spends money</em>.
+            </h2>
+            <p class="explain-body">
+              A customer writes in. The agent reads their order, return and payment,
+              finds the policy section that applies, and writes a reply. If money
+              should move, it does not move it — it hands a reviewer a proposal and
+              waits. That pause is the whole point of the project.
+            </p>
+
+            <ol class="pipeline" aria-label="How one request flows">
+              <li><span>1</span>Check who is asking</li>
+              <li><span>2</span>Read the order</li>
+              <li><span>3</span>Find the policy</li>
+              <li><span>4</span>Propose an answer</li>
+              <li class="is-gate"><span>5</span>Rules check, in code</li>
+              <li class="is-human"><span>6</span>A human approves</li>
+              <li class="is-money"><span>7</span>Pay, then verify</li>
+            </ol>
+          </div>
+
+          <aside class="explain-side">
+            <h3>The one rule</h3>
+            <p class="rule">The model <b>proposes</b>.<br />The code <b>decides and pays</b>.</p>
+            <dl class="split-duties">
+              <dt>The model does</dt>
+              <dd>Reading the complaint, summarising records, interpreting policy, writing the reply.</dd>
+              <dt>Only code does</dt>
+              <dd>Who you are, what you own, whether a refund is allowed, how much, and the payment itself.</dd>
+            </dl>
+            <button class="btn btn-ghost btn-sm" id="explain-toggle" type="button">
+              <svg class="ico" aria-hidden="true"><use href="#i-chevron" /></svg>
+              <span>Hide this</span>
+            </button>
+          </aside>
+        </section>
+
+        <!-- numbers -->
+        <div class="stats">
           <article class="stat"><p class="stat-label">Open tickets</p><p class="stat-value" id="s-open">—</p><p class="stat-note" id="s-open-note">&nbsp;</p></article>
-          <article class="stat"><p class="stat-label">Awaiting approval</p><p class="stat-value" id="s-pending">—</p><p class="stat-note">refunds held for a reviewer</p></article>
-          <article class="stat"><p class="stat-label">Refunds settled</p><p class="stat-value" id="s-settled">—</p><p class="stat-note" id="s-settled-note">&nbsp;</p></article>
-          <article class="stat is-guarded"><p class="stat-label">Duplicate refunds</p><p class="stat-value" id="s-dupes">—</p><p class="stat-note">the number this system keeps at zero</p></article>
+          <article class="stat"><p class="stat-label">Waiting for a person</p><p class="stat-value" id="s-pending">—</p><p class="stat-note">refunds it refused to issue alone</p></article>
+          <article class="stat"><p class="stat-label">Refunds paid</p><p class="stat-value" id="s-settled">—</p><p class="stat-note" id="s-settled-note">&nbsp;</p></article>
+          <article class="stat is-guarded"><p class="stat-label">Paid twice by mistake</p><p class="stat-value" id="s-dupes">—</p><p class="stat-note">the number this project exists to keep at zero</p></article>
         </div>
 
         <div class="split">
-
           <!-- composer -->
-          <section class="panel composer" aria-labelledby="composer-h">
+          <section class="panel" aria-labelledby="composer-h">
             <header class="panel-head">
-              <h2 id="composer-h">New request</h2>
-              <span class="hint">as the customer</span>
+              <h2 id="composer-h">Write a complaint</h2>
             </header>
-
             <div class="panel-body">
-              <label class="field" for="order-select">
-                <span class="field-label">Order</span>
-                <select id="order-select"></select>
-              </label>
-              <p class="field-note" id="order-note">&nbsp;</p>
+              <p class="help">Pick a situation — each one is a real record in the database, set up to behave differently.</p>
+              <div class="scenario-grid" id="scenario-buttons"></div>
 
               <label class="field" for="complaint">
-                <span class="field-label">What happened?</span>
-                <textarea id="complaint" rows="5" spellcheck="true"
-                  placeholder="I returned my headphones last week, but I still haven't received my refund."></textarea>
+                <span class="field-label">The message</span>
+                <textarea id="complaint" rows="4" spellcheck="true"></textarea>
               </label>
 
-              <div class="field">
-                <span class="field-label">Seeded scenarios</span>
-                <div class="scenario-grid" id="scenario-buttons"></div>
-              </div>
-
-              <label class="field" for="variant-select">
-                <span class="field-label">Graph variant</span>
-                <select id="variant-select">
-                  <option value="specialists">Specialists — sequential, fact-aware policy</option>
-                  <option value="parallel">Specialists — concurrent</option>
-                  <option value="baseline">Single-agent baseline</option>
-                </select>
+              <label class="field" for="order-select">
+                <span class="field-label">About which order</span>
+                <select id="order-select"></select>
               </label>
+              <p class="help" id="order-note">&nbsp;</p>
+
+              <details class="advanced">
+                <summary>Advanced</summary>
+                <label class="field" for="variant-select">
+                  <span class="field-label">Agent layout</span>
+                  <select id="variant-select">
+                    <option value="specialists">Three specialists, in order (default)</option>
+                    <option value="parallel">Three specialists, at the same time</option>
+                    <option value="baseline">One generalist agent</option>
+                  </select>
+                </label>
+                <p class="help">Changes how the work is split up. The measured difference is in <code>docs/evaluation.md</code>.</p>
+              </details>
             </div>
-
             <footer class="panel-foot">
               <button class="btn btn-primary" id="submit-complaint" type="button">
                 <svg class="ico" aria-hidden="true"><use href="#i-send" /></svg>
-                <span>Submit request</span>
+                <span>Send it</span>
               </button>
-              <kbd class="kbd-hint">Ctrl + Enter</kbd>
+              <kbd>Ctrl + Enter</kbd>
             </footer>
           </section>
 
-          <!-- run detail -->
-          <section class="panel run" aria-labelledby="run-h">
-            <header class="panel-head run-head">
+          <!-- result -->
+          <section class="panel" aria-labelledby="run-h">
+            <header class="panel-head">
               <div>
-                <h2 id="run-h">Resolution</h2>
-                <p class="run-id mono" id="run-id">no run yet</p>
+                <h2 id="run-h">What the agent did</h2>
+                <p class="run-id mono" id="run-id">nothing yet</p>
               </div>
-              <div class="run-head-right">
+              <div class="head-tools">
                 <span class="pill" id="run-status" hidden></span>
-                <button class="btn btn-quiet" id="refresh-run" type="button" hidden>
-                  <svg class="ico" aria-hidden="true"><use href="#i-refresh" /></svg>
-                  <span>Refresh</span>
+                <button class="btn btn-ghost btn-sm" id="refresh-run" type="button" hidden>
+                  <svg class="ico" aria-hidden="true"><use href="#i-refresh" /></svg><span>Refresh</span>
                 </button>
               </div>
             </header>
-
-            <div class="panel-body run-body">
+            <div class="panel-body">
               <div id="outcome"></div>
               <dl class="meta-row" id="run-meta" hidden></dl>
-
               <div class="run-split">
-                <div class="run-col">
-                  <h3 class="sub-head">Workflow timeline</h3>
+                <div>
+                  <h3 class="sub-head">Step by step</h3>
                   <div id="timeline"></div>
                 </div>
-                <div class="run-col">
-                  <h3 class="sub-head">Evidence &amp; policy</h3>
+                <div>
+                  <h3 class="sub-head">What it read, what it quoted</h3>
                   <div id="evidence"></div>
                 </div>
               </div>
             </div>
           </section>
-
         </div>
       </section>
 
-      <!-- ══════════════════════════ APPROVALS ══════════════════════════ -->
+      <!-- ════════════════════════ APPROVALS ════════════════════════ -->
       <section class="view" id="view-approvals">
         <section class="panel">
           <header class="panel-head">
-            <h2>Approval queue</h2>
-            <div class="panel-head-tools">
-              <label class="select-field" for="reviewer-select">
-                <span>Reviewer</span>
+            <h2>Refunds waiting on you</h2>
+            <div class="head-tools">
+              <label class="who small" for="reviewer-select">
+                <span>Reviewing as</span>
                 <select id="reviewer-select"></select>
               </label>
-              <label class="check" for="show-decided">
-                <input type="checkbox" id="show-decided" />
-                <span>Include decided</span>
-              </label>
-              <button class="btn btn-quiet" id="refresh-approvals" type="button">
-                <svg class="ico" aria-hidden="true"><use href="#i-refresh" /></svg>
-                <span>Refresh</span>
+              <label class="check" for="show-decided"><input type="checkbox" id="show-decided" /><span>Show decided</span></label>
+              <button class="btn btn-ghost btn-sm" id="refresh-approvals" type="button">
+                <svg class="ico" aria-hidden="true"><use href="#i-refresh" /></svg><span>Refresh</span>
               </button>
             </div>
           </header>
-          <p class="panel-note">
-            Every refund stops here. An approval binds to one exact proposal payload — change the
-            order or the amount and it is invalidated, and a new approval is required.
+          <p class="help pad">
+            The agent never pays a refund on its own. It writes down exactly what it wants to do
+            and waits here. If anything about that proposal changes afterwards, your approval
+            stops counting and it has to ask again.
           </p>
           <div class="panel-body" id="approvals"></div>
         </section>
       </section>
 
-      <!-- ═════════════════════════ RELIABILITY ═════════════════════════ -->
+      <!-- ═══════════════════════ RELIABILITY ═══════════════════════ -->
       <section class="view" id="view-reliability">
+        <p class="section-lede">
+          The hardest case for any system that spends money: the payment provider takes the
+          refund, then the connection drops before it can tell you. Retry blindly and you have
+          paid twice. Break it here on purpose and see what happens.
+        </p>
         <div class="split split-even">
-
           <section class="panel">
-            <header class="panel-head"><h2>Fault injection</h2></header>
-            <p class="panel-note">
-              Arm a provider failure, then run a refund. What matters is the ledger afterwards.
-            </p>
+            <header class="panel-head"><h2>Break the payment provider</h2></header>
             <div class="panel-body">
-              <div class="table-wrap">
-                <table class="table" id="faults"></table>
-              </div>
+              <div class="table-wrap"><table class="table" id="faults"></table></div>
               <div class="control-row">
-                <label class="select-field grow" for="fault-service">
-                  <span>Service</span>
+                <label class="select-field grow" for="fault-service"><span>Service</span>
                   <select id="fault-service">
                     <option value="payments">payments</option>
                     <option value="shipping">shipping</option>
                     <option value="ticketing">ticketing</option>
                   </select>
                 </label>
-                <label class="select-field grow" for="fault-mode">
-                  <span>Failure</span>
-                  <select id="fault-mode"></select>
-                </label>
-                <label class="select-field narrow" for="fault-uses">
-                  <span>Uses</span>
-                  <input type="number" id="fault-uses" value="1" min="1" max="10" />
-                </label>
+                <label class="select-field grow" for="fault-mode"><span>How it fails</span><select id="fault-mode"></select></label>
+                <label class="select-field narrow" for="fault-uses"><span>Times</span><input type="number" id="fault-uses" value="1" min="1" max="10" /></label>
               </div>
+              <p class="help" id="fault-explain"></p>
               <div class="control-row">
-                <button class="btn" id="apply-fault" type="button">Arm failure</button>
-                <button class="btn btn-quiet" id="clear-faults" type="button">Clear all</button>
+                <button class="btn" id="apply-fault" type="button">Arm it</button>
+                <button class="btn btn-ghost" id="clear-faults" type="button">Clear</button>
               </div>
             </div>
 
-            <header class="panel-head bordered"><h2>Crash recovery</h2></header>
-            <p class="panel-note">
-              What a worker does on restart: reconcile every in-flight refund against the provider
-              by idempotency key, then resume any workflow whose approval was decided while the
-              process was down.
-            </p>
+            <header class="panel-head bordered"><h2>Pretend the server crashed</h2></header>
             <div class="panel-body">
-              <button class="btn btn-primary" id="run-recovery" type="button">Run recovery sweep</button>
+              <p class="help">
+                On restart it asks the provider about every refund it was unsure of, using the
+                same key it sent, and only then carries on. That order matters: money first,
+                workflow second.
+              </p>
+              <button class="btn btn-primary" id="run-recovery" type="button">Run the restart check</button>
               <pre class="code" id="recovery-output" hidden></pre>
             </div>
           </section>
 
           <section class="panel">
             <header class="panel-head">
-              <h2>Refund ledger</h2>
-              <button class="btn btn-quiet" id="refresh-ledger" type="button">
-                <svg class="ico" aria-hidden="true"><use href="#i-refresh" /></svg>
-                <span>Refresh</span>
+              <h2>The money, both sides</h2>
+              <button class="btn btn-ghost btn-sm" id="refresh-ledger" type="button">
+                <svg class="ico" aria-hidden="true"><use href="#i-refresh" /></svg><span>Refresh</span>
               </button>
             </header>
-            <p class="panel-note">
-              Our operations on the left, the payment provider's own records on the right. One
-              idempotency key, one refund, on both sides.
+            <p class="help pad">
+              Our record of every refund on the left, the payment provider's own record on the
+              right. Each refund carries a key. The same key must never appear twice.
             </p>
             <div class="panel-body" id="ledger"></div>
           </section>
-
         </div>
       </section>
 
-      <!-- ══════════════════════════ REFERENCE ══════════════════════════ -->
+      <!-- ════════════════════════ REFERENCE ════════════════════════ -->
       <section class="view" id="view-reference">
         <div class="split split-even">
-
           <section class="panel">
-            <header class="panel-head"><h2>Tool contracts</h2></header>
-            <p class="panel-note">
-              Least privilege per specialist. No tool takes a customer id — identity is derived
-              from the authenticated request, so there is nothing for a model to override.
+            <header class="panel-head"><h2>What each agent may touch</h2></header>
+            <p class="help pad">
+              Every agent gets the smallest set of tools that does its job. The one that reads
+              your order cannot pay you; only the step after a human approval can. Notice that
+              nothing takes a customer id — the agent cannot choose whose account to look at.
             </p>
             <div class="panel-body" id="tools"></div>
           </section>
 
           <section class="panel">
-            <header class="panel-head"><h2>Policy library</h2></header>
-            <p class="panel-note">
-              Versioned with effective dates. Retrieval filters to the version in force and
-              returns citations down to the section.
+            <header class="panel-head"><h2>The policy book</h2></header>
+            <p class="help pad">
+              Written as plain documents with version numbers and dates. The agent quotes them
+              by section, so you can always check the answer against the rule it used. Old
+              versions stay readable but are never quoted.
             </p>
             <div class="panel-body" id="policies"></div>
 
-            <header class="panel-head bordered"><h2>Retrieval</h2></header>
+            <header class="panel-head bordered"><h2>Ask the policy book</h2></header>
             <div class="panel-body">
               <div class="control-row">
-                <label class="select-field grow" for="policy-query">
-                  <span>Query</span>
-                  <input type="text" id="policy-query" placeholder="return received but not inspected" />
-                </label>
+                <label class="select-field grow" for="policy-query"><span>Question</span>
+                  <input type="text" id="policy-query" placeholder="returned item not inspected yet" /></label>
                 <button class="btn" id="policy-search" type="button">
-                  <svg class="ico" aria-hidden="true"><use href="#i-search" /></svg>
-                  <span>Search</span>
+                  <svg class="ico" aria-hidden="true"><use href="#i-search" /></svg><span>Search</span>
                 </button>
               </div>
               <div id="policy-results"></div>
             </div>
           </section>
-
         </div>
       </section>
 
     </div>
 
     <footer class="appfoot">
-      <span>Synthetic customers, synthetic policies, mock payment provider. No real money moves.</span>
+      <span>Made-up customers, made-up policies, a pretend payment provider. No real money moves.</span>
       <span class="appfoot-links">
-        <a href="/docs" target="_blank" rel="noopener">
-          API reference <svg class="ico ico-xs" aria-hidden="true"><use href="#i-link" /></svg>
-        </a>
-        <span class="mono" id="build-tag">v1.0.0</span>
+        <a href="/docs" target="_blank" rel="noopener">API reference <svg class="ico ico-xs" aria-hidden="true"><use href="#i-link" /></svg></a>
+        <span class="mono">v1.1</span>
       </span>
     </footer>
   </div>
 </div>
 
-<div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
-
+<div class="toasts" id="toasts" aria-live="polite"></div>
 <script src="/static/app.js"></script>
 </body>
 </html>

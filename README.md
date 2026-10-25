@@ -67,36 +67,46 @@ make demo        # narrated walkthrough of the three demos below
 
 ---
 
-## The console
+## Watch it work
 
 ![Walkthrough of the support console](docs/walkthrough.gif)
 
-<sub>51-second walkthrough — eligible refund held for approval, a correctly blocked
-request, and recovery after the payment provider accepts a refund and the response is
-lost. Full quality: [`docs/walkthrough.mp4`](docs/walkthrough.mp4). Assembled from
-frames captured against the running app; every number and timestamp in it is real.</sub>
+<sub>**[Full 78-second walkthrough &rarr; `docs/walkthrough.mp4`](docs/walkthrough.mp4)**
+&mdash; the whole story with narration cards: an eligible refund held for approval,
+a request correctly refused by policy, and recovery after the payment provider takes
+a refund and the connection drops. The GIF above is the condensed version.
+The UI frames are real screenshots of the running app; every amount, timestamp and
+idempotency key in them came out of an actual run.</sub>
 
-A four-section operations console served by the same app. Vanilla HTML, CSS and
-JavaScript — no build step, no bundler, and it works with the network off.
-Light and dark both designed, theme remembered per browser.
+## The console
 
-- **Console** — submit a request as a customer and watch it resolve: live
-  counters, the workflow timeline, the records read and policy cited, and the
-  outcome. Fourteen seeded scenarios are one click away, each switching to the
-  customer who owns that order.
-- **Approvals** — what a support reviewer sees before deciding: customer,
-  order, amount, the complaint in their own words, the agent's reason, the
-  evidence and policy citations, the proposal's payload hash and its expiry,
-  and the reply the customer will receive.
-- **Reliability** — arm a provider failure, run a refund, then read our refund
-  operations beside the provider's own records. Run the recovery sweep and
-  watch the ledger stay at one refund per idempotency key.
-- **Tools & policy** — the tool contracts with the toolsets that may call them,
-  the versioned policy library, and a live retrieval box.
+Four sections, served by the same app. Vanilla HTML, CSS and JavaScript &mdash; no
+build step, no bundler, and it works with the network off. Light and dark are both
+designed, and the choice is remembered per browser.
 
-The header counter that matters is **duplicate refunds**: it is the number this
-system exists to keep at zero, so it sits on the first screen rather than in a
-test report.
+It is built to be understood by someone who has never seen it. The first screen
+states what the system is, the one rule it follows, and the seven steps every
+request takes &mdash; with the three steps a language model never touches marked out.
+Every event the workflow emits is shown as a sentence (*"Connection lost &mdash;
+outcome unknown"*) with the machine name (`refund.outcome_unknown`) underneath it.
+
+- **Console** &mdash; write a complaint as a customer and watch it resolve: live
+  counters, every step in order, the records it opened, the policy it quoted, and
+  the outcome with a line explaining *why* that outcome. Fourteen seeded situations
+  are one click away, each switching to the customer who owns that order.
+- **Approvals** &mdash; what a reviewer sees before deciding: the complaint in the
+  customer's own words, the agent's reason, the order, the evidence and policy it
+  cited, the reply the customer would receive, and why that approval cannot be
+  reused if anything changes.
+- **Reliability** &mdash; break the payment provider on purpose, run a refund, then
+  read our ledger beside the provider's own. Run the restart check and watch it stay
+  at one refund per key.
+- **Reference** &mdash; what each agent is allowed to call, in plain language, and the
+  versioned policy book with a live search box.
+
+The counter that matters sits on the first screen: **paid twice by mistake**. It is
+the number this project exists to keep at zero, so it belongs in front of you rather
+than in a test report.
 
 ---
 
@@ -226,7 +236,8 @@ eval suite checks exactly that.
 ## Three demos
 
 `make demo` runs all three with a narrated transcript; the console does the
-same by hand, and `docs/walkthrough.mp4` shows that run end to end.
+same by hand, and [`docs/walkthrough.mp4`](docs/walkthrough.mp4) walks through
+them with explanation.
 
 **A — an approved refund.** Customer chases a refund on a returned, inspected
 item. The agent gathers the records, cites `refund_policy_v2:section_3`, and
