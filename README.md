@@ -28,7 +28,11 @@ part where being wrong costs money.
 
 ## Run it
 
-Nothing to install beyond Python 3.11+. The default database is a SQLite file
+**On Windows, double-click `start.bat`.** It resets the demo data, starts the
+server and opens <http://localhost:8000>. Close the black window to stop it.
+[`DEMO.md`](DEMO.md) is the three-minute walkthrough script.
+
+Everything below is the manual equivalent. Nothing to install beyond Python 3.11+. The default database is a SQLite file
 in the repo, and with no `ANTHROPIC_API_KEY` the agents run a deterministic
 reasoner, so the whole system — dashboard, workflow, approvals, evals — works
 offline and for free.
