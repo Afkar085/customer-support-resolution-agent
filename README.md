@@ -7,6 +7,13 @@ policy, proposes a resolution, **requires a human to approve any refund**,
 executes the approved refund idempotently, verifies the result with the payment
 provider, and updates the ticket with what actually happened.
 
+![Python](https://img.shields.io/badge/Python-3.11+-3670A0?style=flat-square&logo=python&logoColor=ffdd54)
+![LangGraph](https://img.shields.io/badge/LangGraph-1C3C3C?style=flat-square)
+![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=flat-square&logo=fastapi)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-%23316192?style=flat-square&logo=postgresql&logoColor=white)
+![tests](https://img.shields.io/badge/tests-107-08724e?style=flat-square)
+![evals](https://img.shields.io/badge/evals-60%20cases-08724e?style=flat-square)
+
 **Python · LangGraph · FastAPI · PostgreSQL (SQLite for a zero-setup demo)**
 
 Synthetic customers, synthetic policies and a mock payment provider throughout.
@@ -26,12 +33,23 @@ part where being wrong costs money.
 
 ---
 
+## Watch it work
+
+![Walkthrough of the support console](docs/walkthrough.gif)
+
+<sub>**[Full 78-second walkthrough &rarr; `docs/walkthrough.mp4`](docs/walkthrough.mp4)**
+&mdash; the whole story with narration cards: an eligible refund held for approval,
+a request correctly refused by policy, and recovery after the payment provider takes
+a refund and the connection drops. The GIF above is the condensed version.
+The UI frames are real screenshots of the running app; every amount, timestamp and
+idempotency key in them came out of an actual run.</sub>
+
+---
+
 ## Run it
 
 **On Windows, double-click `start.bat`.** It resets the demo data, starts the
 server and opens <http://localhost:8000>. Close the black window to stop it.
-[`DEMO.md`](DEMO.md) is the three-minute walkthrough script, and
-[`INTERVIEW.md`](INTERVIEW.md) is why it exists and the questions it invites.
 
 Everything below is the manual equivalent. Nothing to install beyond Python 3.11+. The default database is a SQLite file
 in the repo, and with no `ANTHROPIC_API_KEY` the agents run a deterministic
@@ -86,17 +104,6 @@ make demo        # narrated walkthrough of the three demos below
 ```
 
 ---
-
-## Watch it work
-
-![Walkthrough of the support console](docs/walkthrough.gif)
-
-<sub>**[Full 78-second walkthrough &rarr; `docs/walkthrough.mp4`](docs/walkthrough.mp4)**
-&mdash; the whole story with narration cards: an eligible refund held for approval,
-a request correctly refused by policy, and recovery after the payment provider takes
-a refund and the connection drops. The GIF above is the condensed version.
-The UI frames are real screenshots of the running app; every amount, timestamp and
-idempotency key in them came out of an actual run.</sub>
 
 ## The console
 
@@ -175,7 +182,7 @@ and which deliberately do not.
 
 ---
 
-## The parts worth reviewing
+## The hard parts
 
 ### Approval is a row, not a conversation
 
@@ -369,19 +376,3 @@ docs/           architecture, evaluation
 - One store, one currency, one issue per workflow. No partial line-item refunds.
 - The baseline variant is one node with one broad toolset, not a true
   single-prompt tool-use agent, so the comparison measures accuracy, not cost.
-
----
-
-## Résumé line
-
-> Built a customer support resolution system (Python, LangGraph, FastAPI,
-> PostgreSQL) combining versioned policy retrieval, typed tool integrations and
-> human-approved refunds with a redacted audit trail. Scored **100% verified
-> resolution** across 60 synthetic cases (91.7% on the first blind run of the
-> held-out split) with **0 unauthorized actions** and **0 duplicate refunds**
-> across 20 retry, concurrency, replay and crash scenarios; a fact-aware
-> multi-agent design raised policy-retrieval recall from **80% to 100%** over a
-> single-agent baseline.
-
-Numbers come from `evals/reports/`. They are synthetic-test results, not
-production performance.
